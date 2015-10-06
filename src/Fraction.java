@@ -7,31 +7,77 @@ public class Fraction implements Comparable<Fraction> {
 
    /** Main method. Different tests. */
    public static void main (String[] param) {
-      // TODO!!! Your debugging tests here
+
    }
 
-   // TODO!!! instance variables here
+	private int numerator;
+	private int denominator;
 
    /** Constructor.
     * @param a numerator
     * @param b denominator > 0
     */
    public Fraction (int a, int b) {
-      // TODO!!!
+	   if (b == 0)
+		   throw new RuntimeException("Fraction denominator must be positive.");
+	   
+	   int qcd = 0;
+	   int tempA;
+	   int tempB;
+	   
+	   if (a != 0) {
+		   if (a < 0)
+			   tempA = a * (-1);
+		   else 
+			   tempA = a;
+		   
+		   if (b < 0)
+			   tempB = b * (-1);
+		   else
+			   tempB = b;
+		   
+		   if (a > b) 
+			   qcd = calcQCD(tempA, tempB);
+		   else if (a < b)
+			   qcd = calcQCD(tempB, tempA);
+	   }
+	   
+	   if (qcd != 0) {
+		   a = a / qcd;
+		   b = b / qcd;
+	   }
+	   
+	   if (b < 0 || ((b < 0) && (a < 0))) {
+		   a *= -1;
+		   b *= -1;
+	   }
+	 
+	   this.numerator = a;
+	   this.denominator = b;
+   }
+   
+   /* Leiab suurima ühise kordaja.
+    * Info ja pseudokood: https://en.wikipedia.org/wiki/Euclidean_algorithm 
+    */
+   private int calcQCD(int x, int y) {
+	   if (y == 0)
+		   return x;
+	   else
+		   return calcQCD(y, x%y);
    }
 
    /** Public method to access the numerator field. 
     * @return numerator
     */
    public int getNumerator() {
-      return 0; // TODO!!!
+      return numerator;
    }
 
    /** Public method to access the denominator field. 
     * @return denominator
     */
    public int getDenominator() { 
-      return 1; // TODO!!!
+      return denominator;
    }
 
    /** Conversion to string.
@@ -39,7 +85,11 @@ public class Fraction implements Comparable<Fraction> {
     */
    @Override
    public String toString() {
-      return ""; // TODO!!!
+	   StringBuffer sb = new StringBuffer();
+	   sb.append(this.numerator);
+	   sb.append("/");
+	   sb.append(this.denominator);
+	   return sb.toString();
    }
 
    /** Equality test.
@@ -48,7 +98,12 @@ public class Fraction implements Comparable<Fraction> {
     */
    @Override
    public boolean equals (Object m) {
-      return false; // TODO!!!
+//	   if (this.denominator == ((Fraction) m).getDenominator()) {
+//		   return (this.numerator == ((Fraction) m).getNumerator());
+//	   }
+//	   
+//	   return false;
+	   return this.toString().equals(((Fraction) m).toString());
    }
 
    /** Hashcode has to be equal for equal fractions.
@@ -64,7 +119,10 @@ public class Fraction implements Comparable<Fraction> {
     * @return this+m
     */
    public Fraction plus (Fraction m) {
-      return null; // TODO!!!
+	   int d = this.denominator * m.getDenominator();
+	   int n = (this.numerator * m.getDenominator()) + (this.denominator * m.getNumerator());
+	   
+	   return new Fraction(n, d);
    }
 
    /** Multiplication of fractions.
@@ -72,21 +130,30 @@ public class Fraction implements Comparable<Fraction> {
     * @return this*m
     */
    public Fraction times (Fraction m) {
-      return null; // TODO!!!
+	   int n = this.numerator * m.getNumerator();
+	   int d = this.denominator * m.getDenominator();
+	   
+	   return new Fraction(n, d);
    }
 
    /** Inverse of the fraction. n/d becomes d/n.
     * @return inverse of this fraction: 1/this
     */
    public Fraction inverse() throws ArithmeticException {
-      return null; // TODO!!!
+	   int temp = this.numerator;
+	   int n = this.denominator;
+	   int d = temp;
+	   
+	   return new Fraction(n, d);
    }
 
    /** Opposite of the fraction. n/d becomes -n/d.
     * @return opposite of this fraction: -this
     */
    public Fraction opposite() {
-      return null; // TODO!!!
+	   int n = this.numerator * (-1);
+	   
+	   return new Fraction(n, this.denominator);
    }
 
    /** Difference of fractions.
@@ -94,7 +161,10 @@ public class Fraction implements Comparable<Fraction> {
     * @return this-m
     */
    public Fraction minus (Fraction m) {
-      return null; // TODO!!!
+	   int d = this.denominator * m.getDenominator();
+	   int n = (this.numerator * m.getDenominator()) - (this.denominator * m.getNumerator());
+	   
+	   return new Fraction(d, n);
    }
 
    /** Quotient of fractions.
@@ -102,7 +172,10 @@ public class Fraction implements Comparable<Fraction> {
     * @return this/m
     */
    public Fraction divideBy (Fraction m) throws ArithmeticException {
-      return null; // TODO!!!
+	   int d = this.denominator * m.getNumerator();
+	   int n = this.numerator * m.getDenominator();
+	   
+	   return new Fraction(n, d);
    }
 
    /** Comparision of fractions.
@@ -111,7 +184,16 @@ public class Fraction implements Comparable<Fraction> {
     */
    @Override
    public int compareTo (Fraction m) {
-      return 0; // TODO!!!
+	   int thisN = this.numerator * m.getDenominator();
+	   int mN = this.denominator * m.getNumerator();
+	   
+	   if (thisN < mN) {
+		   return -1;
+	   } else if (thisN == mN) {
+		   return 0;
+	   } else {
+		   return 1;
+	   }
    }
 
    /** Clone of the fraction.
@@ -119,14 +201,21 @@ public class Fraction implements Comparable<Fraction> {
     */
    @Override
    public Object clone() throws CloneNotSupportedException {
-      return null; // TODO!!!
+	   int n = this.numerator;
+	   int d = this.denominator;
+	   
+	   return new Fraction(n, d);
    }
 
    /** Integer part of the (improper) fraction. 
     * @return integer part of this fraction
     */
    public int integerPart() {
-      return 0; // TODO!!!
+	   if (this.numerator >= this.denominator) {
+		   return (this.numerator / this.denominator);
+	   }
+	   
+	   return 0;
    }
 
    /** Extract fraction part of the (improper) fraction
@@ -134,14 +223,19 @@ public class Fraction implements Comparable<Fraction> {
     * @return fraction part of this fraction
     */
    public Fraction fractionPart() {
-      return null; // TODO!!!
+	   if (this.numerator > this.denominator) {
+		   int remainder = this.numerator / this.denominator;
+		   return new Fraction(remainder, this.denominator);
+	   }
+	   
+	   return new Fraction(this.numerator, this.denominator);
    }
 
    /** Approximate value of the fraction.
     * @return numeric value of this fraction
     */
    public double toDouble() {
-      return 0.; // TODO!!!
+	   return ((double) this.numerator / (double) this.denominator);
    }
 
    /** Double value f presented as a fraction with denominator d > 0.
@@ -150,7 +244,8 @@ public class Fraction implements Comparable<Fraction> {
     * @return f as an approximate fraction of form n/d
     */
    public static Fraction toFraction (double f, int d) {
-      return null; // TODO!!!
+	   int n = (int) f * d;
+	   return new Fraction(n, d);
    }
 
    /** Conversion from string to the fraction. Accepts strings of form
@@ -159,7 +254,14 @@ public class Fraction implements Comparable<Fraction> {
     * @return fraction represented by s
     */
    public static Fraction valueOf (String s) {
-      return null; // TODO!!!
+	   s = s.trim().replaceAll("\\s+","");
+	   
+	   if (!(s.matches("[\\d-/]+")))
+		   throw new RuntimeException("String '" + s + "' contains illegal characters.");
+	   
+	   String [] fraction = s.split("/");
+	   
+	   return null; // TODO!!!
    }
 }
 
