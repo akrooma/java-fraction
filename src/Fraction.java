@@ -7,12 +7,14 @@ public class Fraction implements Comparable<Fraction> {
 
    /** Main method. Different tests. */
    public static void main (String[] param) {
-	   Fraction f = new Fraction(5,3);
-	   
+//	   Fraction f = Fraction.toFraction(-10., 2);
+//	   Fraction f2 = new Fraction(2, 3);
 //	   System.out.println(calcGCD(300,1));
-	   
-	   System.out.println(f.fractionPart());
-	   
+//	   
+//	   System.out.println(-10. * 2 + 0.5d);
+//	   
+//	   System.out.println(f.toString());
+//	   
 //	   System.out.println(valueOf(s).toString());
    }
 
@@ -51,7 +53,7 @@ public class Fraction implements Comparable<Fraction> {
    /* Leiab suurima ühise kordaja.
     * Info ja pseudokood: https://en.wikipedia.org/wiki/Euclidean_algorithm 
     */
-   public int calcGCD(int x, int y) {
+   private int calcGCD(int x, int y) {
 	   if (x < 0)
 		   x *= -1;
 	   
@@ -116,15 +118,14 @@ public class Fraction implements Comparable<Fraction> {
 
    //http://javarevisited.blogspot.com.ee/2011/10/override-hashcode-in-java-example.html
    //http://stackoverflow.com/questions/113511/best-implementation-for-hashcode-method
-   
    /** Hashcode has to be equal for equal fractions.
     * @return hashcode
     */
    @Override
    public int hashCode() {
 	   int hash = 5;
-	   hash = 31 * hash + (int) (this.numerator ^ (this.numerator >>> 32));
-	   hash = 31 * hash + (int) (this.denominator ^ (this.denominator >>> 32));
+	   hash = 31 * hash + this.numerator;
+	   hash = 31 * hash + this.denominator;
 	   
 	   return hash;
    }
@@ -195,8 +196,17 @@ public class Fraction implements Comparable<Fraction> {
     * @return -1 if this < m; 0 if this==m; 1 if this > m
     */
    @Override
-   public int compareTo (Fraction m) {
-	   return this.compareTo(m);
+   public int compareTo(Fraction m) {
+	   int thisNumeratorExtended = this.numerator * m.getDenominator();
+	   int mNumeratorExtended = this.denominator * m.getNumerator();
+	   
+	   if (thisNumeratorExtended < mNumeratorExtended) {
+   		   return -1;
+   	   } else if (thisNumeratorExtended == mNumeratorExtended) {
+   		   return 0;
+   	   } else {
+   		   return 1;
+   	   }
    }
 
    /** Clone of the fraction.
@@ -211,7 +221,7 @@ public class Fraction implements Comparable<Fraction> {
     * @return integer part of this fraction
     */
    public int integerPart() {
-	   if (this.numerator > this.denominator) {
+	   if (Math.abs(this.numerator) > this.denominator) {
 		   return (this.numerator / this.denominator);
 	   }
 	   
@@ -223,8 +233,8 @@ public class Fraction implements Comparable<Fraction> {
     * @return fraction part of this fraction
     */
    public Fraction fractionPart() {
-	   if (this.numerator > this.denominator) {
-		   int remainder = this.numerator / this.denominator;
+	   if (Math.abs(this.numerator) > this.denominator) {
+		   int remainder = this.numerator % this.denominator;
 		   return new Fraction(remainder, this.denominator);
 	   }
 	   
@@ -244,7 +254,14 @@ public class Fraction implements Comparable<Fraction> {
     * @return f as an approximate fraction of form n/d
     */
    public static Fraction toFraction (double f, int d) {
-	   return new Fraction(((int) f * d), d);
+	   /*
+	    * Kui castida double intiks, siis kaotatakse kõik koma taga olevad väärtused.
+	    * Et saada ka n-ö ülesse ümardamisega castimist, siis tuleb suurendada arvutatud 
+	    * double väärtust 0.5 võrra.
+	    */
+	   double up = (f < 0) ? -0.5 : 0.5;
+	   
+	   return new Fraction(((int) (f * d + up)), d);
    }
 
    /** Conversion from string to the fraction. Accepts strings of form
@@ -253,7 +270,7 @@ public class Fraction implements Comparable<Fraction> {
     * @return fraction represented by s
     */
    public static Fraction valueOf (String s) {
-	   if (!(s.matches("[\\s\\d-/]+")))
+	   if (!(s.matches("[\\s\\d-/()]+")))
 		   throw new RuntimeException("Fraction " + s + " contains illegal characters.");
 	   
 	   s = s.trim().replaceAll("[\\s()]+","");
