@@ -7,15 +7,7 @@ public class Fraction implements Comparable<Fraction> {
 
    /** Main method. Different tests. */
    public static void main (String[] param) {
-//	   Fraction f = Fraction.toFraction(-10., 2);
-//	   Fraction f2 = new Fraction(2, 3);
-//	   System.out.println(calcGCD(300,1));
-//	   
-//	   System.out.println(-10. * 2 + 0.5d);
-//	   
-//	   System.out.println(f.toString());
-//	   
-//	   System.out.println(valueOf(s).toString());
+
    }
 
 	private int numerator;
@@ -27,7 +19,7 @@ public class Fraction implements Comparable<Fraction> {
     */
    public Fraction (int a, int b) {	   
 	   if (b == 0)
-		   throw new RuntimeException("Fraction denominator must be positive.");
+		   throw new RuntimeException("Fraction denominator cannot be zero.");
 	   
 	   int gcd;
 	   
@@ -41,7 +33,7 @@ public class Fraction implements Comparable<Fraction> {
 		   b = b / gcd;
 	   }
 	   
-	   if (b < 0 || ((b < 0) && (a < 0))) {
+	   if (b < 0) {
 		   a *= -1;
 		   b *= -1;
 	   }
@@ -85,19 +77,27 @@ public class Fraction implements Comparable<Fraction> {
     */
    @Override
    public String toString() {
-	   StringBuffer sb = new StringBuffer();
-	   if (this.numerator < 0) {
-		   sb.append("(");
-		   sb.append(this.numerator);
-		   sb.append(")");
-	   } else {
-		   sb.append(this.numerator);
-	   }
+	   String s;
 	   
-	   sb.append("/");
-	   sb.append(this.denominator);
+	   if (this.numerator > 0)
+		   return Integer.toString(this.numerator) + "/" + Integer.toString(this.denominator);
+	   else
+		   s = "(" + Integer.toString(this.numerator) + ")/";
 	   
-	   return sb.toString();
+	   return s + Integer.toString(this.denominator);
+//	   StringBuffer sb = new StringBuffer();
+//	   if (this.numerator < 0) {
+//		   sb.append("(");
+//		   sb.append(this.numerator);
+//		   sb.append(")");
+//	   } else {
+//		   sb.append(this.numerator);
+//	   }
+//	   
+//	   sb.append("/");
+//	   sb.append(this.denominator);
+//	   
+//	   return sb.toString();
    }
 
    /** Equality test.
@@ -110,12 +110,14 @@ public class Fraction implements Comparable<Fraction> {
 		   return false;
 	   
 	   if (m instanceof Fraction) {
-		   return this.toString().equals(((Fraction) m).toString());
+		   return (this.numerator == ((Fraction) m).getNumerator() &&
+				   this.denominator == ((Fraction) m).getDenominator());
 	   }
 	   
 	   return false;	   
    }
 
+   //Infot hashkoodide kohta lugesin siit:
    //http://javarevisited.blogspot.com.ee/2011/10/override-hashcode-in-java-example.html
    //http://stackoverflow.com/questions/113511/best-implementation-for-hashcode-method
    /** Hashcode has to be equal for equal fractions.
@@ -182,8 +184,9 @@ public class Fraction implements Comparable<Fraction> {
     * @return this/m
     */
    public Fraction divideBy (Fraction m) throws ArithmeticException {
-	   if (this.numerator == 0)
-		   throw new RuntimeException("Fraction " + m.toString() + "must have a non-zero numerator");
+	   if (m.getNumerator() == 0)
+		   throw new ArithmeticException("Fraction " + m.toString() + "must have a non-zero numerator. "
+		   		+ "Cannot divide by zero.");
 	   
 	   int d = this.denominator * m.getNumerator();
 	   int n = this.numerator * m.getDenominator();
@@ -273,7 +276,7 @@ public class Fraction implements Comparable<Fraction> {
 	   if (!(s.matches("[\\s\\d-/()]+")))
 		   throw new RuntimeException("Fraction " + s + " contains illegal characters.");
 	   
-	   s = s.trim().replaceAll("[\\s()]+","");
+	   s = s.trim().replaceAll("[\\s()]+", "");
 	   
 	   String [] fraction = s.split("/");
 	   
